@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>开局觉醒扫把星系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.8;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .nav {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: #fff;
+            cursor: pointer;
+        }
+        .content {
+            padding: 40px 30px;
+            font-size: 18px;
+            line-height: 2;
+        }
+        .content h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        .content p {
+            margin-bottom: 1.5em;
+            text-indent: 2em;
+        }
+        .content p:first-of-type {
+            text-indent: 0;
+        }
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            color: #999;
+        }
+        .footer {
+            background: #f8f8f8;
+            padding: 20px;
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .content {
+                padding: 20px 15px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>开局觉醒扫把星系统</h1>
+            <p>给敌人加霉运，让自己走好运</p>
+        </div>
+        <div class="nav">
+            <select id="chapterSelect" onchange="loadChapter()">
+                <option value="">选择章节</option>
+            </select>
+        </div>
+        <div class="content" id="content">
+            <div class="loading">请选择章节开始阅读</div>
+        </div>
+        <div class="footer">
+            <p>共 20 章 | 持续更新中</p>
+        </div>
+    </div>
+
+    <script>
+        const chapters = [
+            "第1章.md", "第2章.md", "第3章.md", "第4章.md", "第5章.md",
+            "第6章.md", "第7章.md", "第8章.md", "第9章.md", "第10章.md",
+            "第11章.md", "第12章.md", "第13章.md", "第14章.md", "第15章.md",
+            "第16章.md", "第17章.md", "第18章.md", "第19章.md", "第20章.md"
+        ];
+
+        const select = document.getElementById('chapterSelect');
+        chapters.forEach((file, index) => {
+            const option = document.createElement('option');
+            option.value = file;
+            option.textContent = file.replace('.md', '');
+            select.appendChild(option);
+        });
+
+        function loadChapter() {
+            const file = select.value;
+            if (!file) return;
+
+            document.getElementById('content').innerHTML = '<div class="loading">加载中...</div>';
+
+            fetch(file)
+                .then(response => response.text())
+                .then(text => {
+                    const html = markdownToHtml(text);
+                    document.getElementById('content').innerHTML = html;
+                    window.scrollTo(0, 0);
+                })
+                .catch(err => {
+                    document.getElementById('content').innerHTML = '<div class="loading">加载失败，请重试</div>';
+                });
+        }
+
+        function markdownToHtml(markdown) {
+            let html = markdown
+                .replace(/^# (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^## (.*$)/gim, '<h3>$1</h3>')
+                .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
+                .replace(/\*(.*)\*/gim, '<em>$1</em>')
+                .replace(/\n\n/gim, '</p><p>')
+                .replace(/\n/gim, '<br>');
+            
+            if (!html.startsWith('<h2>')) {
+                html = '<p>' + html + '</p>';
+            }
+            
+            return html;
+        }
+
+        // 加载第一章
+        select.value = chapters[0];
+        loadChapter();
+    </script>
+</body>
+</html>
